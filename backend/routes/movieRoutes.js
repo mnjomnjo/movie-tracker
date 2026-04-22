@@ -14,10 +14,20 @@ router.post("/", async (req, res) => {
   }
 });
 
-// GET: Get all movies
+// GET: Get all movies (with optional filters)
 router.get("/", async (req, res) => {
   try {
-    const movies = await Movie.find();
+    const query = {};
+
+    if (req.query.genre) {
+      query.genre = req.query.genre;
+    }
+
+    if (req.query.rating) {
+      query.rating = { $gte: Number(req.query.rating) };
+    }
+
+    const movies = await Movie.find(query);
     res.json(movies);
   } catch (error) {
     res.status(500).json({ error: error.message });
