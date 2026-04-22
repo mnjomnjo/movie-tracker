@@ -9,6 +9,12 @@ const router = express.Router();
  */
 router.post("/", async (req, res) => {
   try {
+    const { title, genre, rating, releaseYear } = req.body;
+
+    if (!title || !genre || !rating || !releaseYear) {
+      return res.status(400).json({ error: "All fields are required" });
+    }
+
     const movie = new Movie(req.body);
     const savedMovie = await movie.save();
 
