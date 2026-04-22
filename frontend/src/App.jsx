@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 
 function App() {
   const [movies, setMovies] = useState([]);
+  const [editingId, setEditingId] = useState(null);
 
-  // Form state
   const [form, setForm] = useState({
     title: "",
     genre: "",
@@ -11,30 +11,51 @@ function App() {
     rating: "",
   });
 
-  // Fetch movies from backend
   const fetchMovies = async () => {
-    try {
-      const res = await fetch("http://localhost:5000/api/movies");
-      const data = await res.json();
-      setMovies(data);
-    } catch (error) {
-      console.error("Error fetching movies:", error);
-    }
+    const res = await fetch("http://localhost:5000/api/movies");
+    const data = await res.json();
+    setMovies(data);
   };
 
-  // Load movies on page load
   useEffect(() => {
     fetchMovies();
   }, []);
 
-  // Handle input change
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // Add movie
+  // 🆕 EDIT
+  const editMovie = (movie) => {
+    setForm({
+      title: movie.title,
+      genre: movie.genre,
+      releaseYear: movie.releaseYear,
+      rating: movie.rating,
+    });
+
+    setEditingId(movie._id);
+  };
+
+  // 🆕 ADD OR UPDATE
   const addMovie = async () => {
-    try {
+    if (editingId) {
+      // UPDATE
+      await fetch(`http://localhost:5000/api/movies/${editingId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...form,
+          releaseYear: Number(form.releaseYear),
+          rating: Number(form.rating),
+        }),
+      });
+
+      setEditingId(null);
+    } else {
+      // ADD
       await fetch("http://localhost:5000/api/movies", {
         method: "POST",
         headers: {
@@ -46,138 +67,157 @@ function App() {
           rating: Number(form.rating),
         }),
       });
-
-      // Clear form
-      setForm({
-        title: "",
-        genre: "",
-        releaseYear: "",
-        rating: "",
-      });
-
-      fetchMovies();
-    } catch (error) {
-      console.error("Error adding movie:", error);
     }
+
+    // reset form
+    setForm({
+      title: "",
+      genre: "",
+      releaseYear: "",
+      rating: "",
+    });
+
+    fetchMovies();
   };
 
-  // DELETE movie
   const deleteMovie = async (id) => {
-    try {
-      await fetch(`http://localhost:5000/api/movies/${id}`, {
-        method: "DELETE",
-      });
+    await fetch(`http://localhost:5000/api/movies/${id}`, {
+      method: "DELETE",
+    });
 
-      fetchMovies(); // refresh list
-    } catch (error) {
-      console.error("Error deleting movie:", error);
-    }
+    fetchMovies();
   };
 
   return (
-    <div
-      style={{
-        padding: "20px",
-        maxWidth: "600px",
-        margin: "auto",
-        fontFamily: "Arial",
-      }}
-    >
-      <h1 style={{ textAlign: "center" }}>🎬 Movie Tracker</h1>
+    <div style={styles.container}>
+      <h1 style={styles.title}>🎬 Movie Tracker</h1>
 
-      {/* Add Movie Form */}
-      <h2>Add Movie</h2>
+      {/* FORM */}
+      <div style={styles.form}>
+        <h2>{editingId ? "Edit Movie" : "Add Movie"}</h2>
 
-      <input
-        name="title"
-        placeholder="Title"
-        value={form.title}
-        onChange={handleChange}
-        style={{ width: "100%", padding: "8px" }}
-      />
-      <br /><br />
+        <input name="title" placeholder="Title" value={form.title} onChange={handleChange} style={styles.input}/>
+        <input name="genre" placeholder="Genre" value={form.genre} onChange={handleChange} style={styles.input}/>
+        <input name="releaseYear" placeholder="Year" value={form.releaseYear} onChange={handleChange} style={styles.input}/>
+        <input name="rating" placeholder="Rating" value={form.rating} onChange={handleChange} style={styles.input}/>
 
-      <input
-        name="genre"
-        placeholder="Genre"
-        value={form.genre}
-        onChange={handleChange}
-        style={{ width: "100%", padding: "8px" }}
-      />
-      <br /><br />
+        <button onClick={addMovie} style={styles.addBtn}>
+          {editingId ? "Update Movie" : "Add Movie"}
+        </button>
 
-      <input
-        name="releaseYear"
-        placeholder="Year"
-        value={form.releaseYear}
-        onChange={handleChange}
-        style={{ width: "100%", padding: "8px" }}
-      />
-      <br /><br />
-
-      <input
-        name="rating"
-        placeholder="Rating"
-        value={form.rating}
-        onChange={handleChange}
-        style={{ width: "100%", padding: "8px" }}
-      />
-      <br /><br />
-
-      <button
-        onClick={addMovie}
-        style={{
-          width: "100%",
-          padding: "10px",
-          background: "#4CAF50",
-          color: "white",
-          border: "none",
-          cursor: "pointer",
-        }}
-      >
-        Add Movie
-      </button>
-
-      <hr />
-
-      {/* Movie List */}
-      <h2>Movies</h2>
-
-      {movies.length === 0 ? (
-        <p>No movies found</p>
-      ) : (
-        movies.map((movie) => (
-          <div
-            key={movie._id}
-            style={{
-              border: "1px solid #ddd",
-              padding: "10px",
-              marginBottom: "10px",
-              borderRadius: "5px",
+        {/* 🆕 Cancel button */}
+        {editingId && (
+          <button
+            onClick={() => {
+              setEditingId(null);
+              setForm({
+                title: "",
+                genre: "",
+                releaseYear: "",
+                rating: "",
+              });
             }}
+            style={styles.cancelBtn}
           >
+            Cancel
+          </button>
+        )}
+      </div>
+
+      {/* LIST */}
+      <h2 style={{ textAlign: "center" }}>Movies</h2>
+
+      <div style={styles.grid}>
+        {movies.map((movie) => (
+          <div key={movie._id} style={styles.card}>
             <h3>{movie.title}</h3>
-            <p>Genre: {movie.genre}</p>
-            <p>Year: {movie.releaseYear}</p>
-            <p>Rating: {movie.rating}</p>
+            <p>🎭 {movie.genre}</p>
+            <p>📅 {movie.releaseYear}</p>
+            <p>⭐ {movie.rating}</p>
+
+            {/* 🆕 EDIT BUTTON */}
+            <button
+              onClick={() => editMovie(movie)}
+              style={styles.editBtn}
+            >
+              Edit
+            </button>
 
             <button
               onClick={() => deleteMovie(movie._id)}
-              style={{
-                background: "red",
-                color: "white",
-                border: "none",
-                padding: "5px 10px",
-                cursor: "pointer",
-              }}
+              style={styles.deleteBtn}
             >
               Delete
             </button>
           </div>
-        ))
-      )}
+        ))}
+      </div>
     </div>
   );
 }
+
+const styles = {
+  container: {
+    maxWidth: "900px",
+    margin: "auto",
+    padding: "20px",
+    fontFamily: "Arial",
+  },
+  title: {
+    textAlign: "center",
+  },
+  form: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "10px",
+    marginBottom: "30px",
+  },
+  input: {
+    padding: "10px",
+    fontSize: "16px",
+  },
+  addBtn: {
+    backgroundColor: "green",
+    color: "white",
+    padding: "10px",
+    border: "none",
+    cursor: "pointer",
+  },
+  cancelBtn: {
+    backgroundColor: "gray",
+    color: "white",
+    padding: "10px",
+    border: "none",
+    cursor: "pointer",
+  },
+  editBtn: {
+    marginTop: "10px",
+    backgroundColor: "orange",
+    color: "white",
+    border: "none",
+    padding: "8px",
+    cursor: "pointer",
+    marginRight: "5px",
+  },
+  grid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+    gap: "20px",
+  },
+  card: {
+    padding: "15px",
+    borderRadius: "10px",
+    boxShadow: "0 0 10px rgba(0,0,0,0.1)",
+    textAlign: "center",
+  },
+  deleteBtn: {
+    marginTop: "10px",
+    backgroundColor: "red",
+    color: "white",
+    border: "none",
+    padding: "8px",
+    cursor: "pointer",
+  },
+};
 
 export default App;

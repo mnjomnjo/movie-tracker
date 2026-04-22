@@ -20,25 +20,26 @@ router.post("/", async (req, res) => {
 
 /**
  * @route   GET /api/movies
- * @desc    Get all movies (with optional filters)
- * @query   genre, rating (minimum rating)
+ * @desc    Get all movies (filters + sorting)
  */
 router.get("/", async (req, res) => {
   try {
     const query = {};
 
-    // Filter by genre (exact match)
+    // 🔥 Filter by genre (case-insensitive)
     if (req.query.genre) {
-      query.genre = req.query.genre;
+      query.genre = { $regex: req.query.genre, $options: "i" };
     }
 
-    // Filter by minimum rating
+    // 🔥 Filter by minimum rating
     if (req.query.rating) {
       query.rating = { $gte: Number(req.query.rating) };
     }
 
-    const movies = await Movie.find(query);
-    res.json(movies);
+    // 🔥 NEW: Sort by newest year first
+    const movies = await Movie.find(query).sort({ releaseYear: -1 });
+
+    res.status(200).json(movies);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -46,7 +47,6 @@ router.get("/", async (req, res) => {
 
 /**
  * @route   GET /api/movies/:id
- * @desc    Get a single movie by ID
  */
 router.get("/:id", async (req, res) => {
   try {
@@ -56,7 +56,7 @@ router.get("/:id", async (req, res) => {
       return res.status(404).json({ message: "Movie not found" });
     }
 
-    res.json(movie);
+    res.status(200).json(movie);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -64,18 +64,16 @@ router.get("/:id", async (req, res) => {
 
 /**
  * @route   DELETE /api/movies/:id
- * @desc    Delete a movie by ID
  */
 router.delete("/:id", async (req, res) => {
   try {
     const deletedMovie = await Movie.findByIdAndDelete(req.params.id);
 
-    // Check if movie exists
     if (!deletedMovie) {
       return res.status(404).json({ message: "Movie not found" });
     }
 
-    res.json({ message: "Movie deleted successfully" });
+    res.status(200).json({ message: "Movie deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -83,7 +81,6 @@ router.delete("/:id", async (req, res) => {
 
 /**
  * @route   PUT /api/movies/:id
- * @desc    Update a movie by ID
  */
 router.put("/:id", async (req, res) => {
   try {
@@ -91,17 +88,16 @@ router.put("/:id", async (req, res) => {
       req.params.id,
       req.body,
       {
-        new: true,          // Return updated document
-        runValidators: true // Apply schema validation on update
+        new: true,
+        runValidators: true,
       }
     );
 
-    // Check if movie exists
     if (!updatedMovie) {
       return res.status(404).json({ message: "Movie not found" });
     }
 
-    res.json(updatedMovie);
+    res.status(200).json(updatedMovie);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
