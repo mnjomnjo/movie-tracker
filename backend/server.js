@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import movieRoutes from "./routes/movieRoutes.js";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -13,6 +14,9 @@ const app = express();
 // Middleware
 app.use(cors()); // Allow cross-origin requests
 app.use(express.json()); // Parse JSON request bodies
+
+// Routes
+app.use("/api/movies", movieRoutes); // Movie API routes
 
 // Connect to MongoDB Atlas using MONGO_URI from .env
 mongoose
