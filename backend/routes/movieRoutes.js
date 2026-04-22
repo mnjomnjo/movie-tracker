@@ -24,4 +24,28 @@ router.get("/", async (req, res) => {
   }
 });
 
+// DELETE: delete a movie by ID
+router.delete("/:id", async (req, res) => {
+  try {
+    await Movie.findByIdAndDelete(req.params.id);
+    res.json({ message: "Movie deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// PUT: update a movie by ID
+router.put("/:id", async (req, res) => {
+  try {
+    const updatedMovie = await Movie.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true } // return updated document
+    );
+    res.json(updatedMovie);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
 export default router;
