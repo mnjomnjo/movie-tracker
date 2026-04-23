@@ -11,6 +11,7 @@ function App() {
     genre: "",
     releaseYear: "",
     rating: "",
+    director: "", // 🔥 NEW
   });
 
   // 🆕 loading + error
@@ -33,9 +34,7 @@ function App() {
   useEffect(() => {
     fetchMovies();
 
-    // 🆕 cleanup (مهم جدًا لللاب)
     const interval = setInterval(fetchMovies, 10000);
-
     return () => clearInterval(interval);
   }, []);
 
@@ -49,6 +48,7 @@ function App() {
       genre: movie.genre,
       releaseYear: movie.releaseYear,
       rating: movie.rating,
+      director: movie.director, // 🔥 NEW
     });
 
     setEditingId(movie._id);
@@ -86,6 +86,7 @@ function App() {
         genre: "",
         releaseYear: "",
         rating: "",
+        director: "", // 🔥 NEW
       });
 
       fetchMovies();
@@ -112,7 +113,6 @@ function App() {
     <div style={{ maxWidth: "900px", margin: "auto" }}>
       <h1>🎬 Movie Tracker</h1>
 
-      {/* 🆕 loading + error */}
       {loading && <p>Loading...</p>}
       {error && <p style={{ color: "red" }}>{error}</p>}
 
@@ -128,6 +128,7 @@ function App() {
             genre: "",
             releaseYear: "",
             rating: "",
+            director: "", // 🔥 NEW
           });
         }}
       />

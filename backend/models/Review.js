@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import "./User.js";   // 🔥 مهم جدًا (يسجل model في mongoose)
+import "./Movie.js";  // 🔥 مهم جدًا
 
 const reviewSchema = new mongoose.Schema({
   comment: {

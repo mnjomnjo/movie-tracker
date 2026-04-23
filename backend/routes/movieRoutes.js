@@ -6,6 +6,7 @@ import {
   updateMovie,
   deleteMovie,
   getTopRatedMovies,
+  getMovieReviews 
 } from "../controllers/movieController.js";
 
 const router = express.Router();
@@ -19,6 +20,12 @@ router.post("/", createMovie);
  * @route   GET /api/movies/top-rated
  */
 router.get("/top-rated", getTopRatedMovies);
+
+/**
+ * 🔥 NEW RELATIONAL ENDPOINT
+ * @route   GET /api/movies/:id/reviews
+ */
+router.get("/:id/reviews", getMovieReviews);
 
 /**
  * @route   GET /api/movies

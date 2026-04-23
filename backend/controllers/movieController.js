@@ -1,4 +1,5 @@
 import Movie from "../models/Movie.js";
+import Review from "../models/Review.js"; // 🔥 NEW
 
 // CREATE movie
 export const createMovie = async (req, res) => {
@@ -99,6 +100,18 @@ export const getTopRatedMovies = async (req, res) => {
     });
 
     res.status(200).json(movies);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// 🔥 NEW: GET reviews for a specific movie (RELATIONAL ENDPOINT)
+export const getMovieReviews = async (req, res) => {
+  try {
+    const reviews = await Review.find({ movieId: req.params.id })
+      .populate("userId", "username email");
+
+    res.status(200).json(reviews);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

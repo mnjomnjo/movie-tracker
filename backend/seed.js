@@ -24,11 +24,11 @@ const seedData = async () => {
       { name: "Omar", email: "omar@test.com" }
     ]);
 const movies = await Movie.insertMany([
-  { title: "Inception", genre: "Sci-Fi", rating: 9, releaseYear: 2010 },
-  { title: "Interstellar", genre: "Sci-Fi", rating: 9, releaseYear: 2014 },
-  { title: "The Dark Knight", genre: "Action", rating: 10, releaseYear: 2008 },
-  { title: "Titanic", genre: "Romance", rating: 8, releaseYear: 1997 },
-  { title: "Avatar", genre: "Fantasy", rating: 7, releaseYear: 2009 }
+  { title: "Inception", genre: "Sci-Fi", rating: 9, releaseYear: 2010, director: "Christopher Nolan" },
+  { title: "Interstellar", genre: "Sci-Fi", rating: 9, releaseYear: 2014, director: "Christopher Nolan" },
+  { title: "The Dark Knight", genre: "Action", rating: 10, releaseYear: 2008, director: "Christopher Nolan" },
+  { title: "Titanic", genre: "Romance", rating: 8, releaseYear: 1997, director: "James Cameron" },
+  { title: "Avatar", genre: "Fantasy", rating: 7, releaseYear: 2009, director: "James Cameron" }
 ]);
 
    await Review.insertMany([

@@ -24,6 +24,13 @@ const movieSchema = new mongoose.Schema(
       min: 1,
       max: 10,
     },
+
+    // 🔥 NEW: Custom Field
+    director: {
+      type: String,
+      required: [true, "Director is required"],
+      trim: true,
+    },
   },
   {
     timestamps: true,
