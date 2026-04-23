@@ -1,5 +1,5 @@
 import Movie from "../models/Movie.js";
-import Review from "../models/Review.js"; // 🔥 NEW
+import Review from "../models/Review.js";
 
 // CREATE movie
 export const createMovie = async (req, res) => {
@@ -19,18 +19,15 @@ export const createMovie = async (req, res) => {
   }
 };
 
-// GET all movies (filter + sort)
+// GET all movies with optional filters
 export const getMovies = async (req, res) => {
   try {
-    const query = {};
+    const { genre, rating, year } = req.query;
+    let query = {};
 
-    if (req.query.genre) {
-      query.genre = { $regex: req.query.genre, $options: "i" };
-    }
-
-    if (req.query.rating) {
-      query.rating = { $gte: Number(req.query.rating) };
-    }
+    if (genre) query.genre = { $regex: genre, $options: "i" };
+    if (rating) query.rating = { $gte: Number(rating) };
+    if (year) query.releaseYear = Number(year);
 
     const movies = await Movie.find(query).sort({ releaseYear: -1 });
 
@@ -40,7 +37,7 @@ export const getMovies = async (req, res) => {
   }
 };
 
-// GET movie by id
+// GET movie by ID
 export const getMovieById = async (req, res) => {
   try {
     const movie = await Movie.findById(req.params.id);
@@ -61,10 +58,7 @@ export const updateMovie = async (req, res) => {
     const updatedMovie = await Movie.findByIdAndUpdate(
       req.params.id,
       req.body,
-      {
-        new: true,
-        runValidators: true,
-      }
+      { new: true, runValidators: true }
     );
 
     if (!updatedMovie) {
@@ -92,7 +86,7 @@ export const deleteMovie = async (req, res) => {
   }
 };
 
-// TOP RATED
+// GET top rated movies (rating >= 8)
 export const getTopRatedMovies = async (req, res) => {
   try {
     const movies = await Movie.find({ rating: { $gte: 8 } }).sort({
@@ -105,11 +99,11 @@ export const getTopRatedMovies = async (req, res) => {
   }
 };
 
-// 🔥 NEW: GET reviews for a specific movie (RELATIONAL ENDPOINT)
+// GET reviews for a specific movie (relational endpoint)
 export const getMovieReviews = async (req, res) => {
   try {
     const reviews = await Review.find({ movieId: req.params.id })
-      .populate("userId", "username email");
+      .populate("userId", "name email");
 
     res.status(200).json(reviews);
   } catch (error) {
