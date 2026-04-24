@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import MovieForm from "./components/MovieForm";
 import MovieList from "./components/MovieList";
 
-const API_URL = "http://localhost:5000/api/movies";
+// ✅ FIX: استخدم 127.0.0.1 بدل localhost
+const API_URL = "http://127.0.0.1:5000/api/movies";
 
 function App() {
   const [movies, setMovies] = useState([]);
@@ -28,7 +29,12 @@ function App() {
       const query = new URLSearchParams(filters).toString();
       const url = query ? `${API_URL}?${query}` : API_URL;
 
-      const res = await fetch(url);
+      const res = await fetch(url, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
       const data = await res.json();
 
       if (!res.ok) {
@@ -37,7 +43,8 @@ function App() {
 
       setMovies(data);
     } catch (err) {
-      setError(err.message || "Failed to fetch movies");
+      console.error("FETCH ERROR 👉", err);
+      setError("Failed to fetch movies ❌");
     } finally {
       setLoading(false);
     }
@@ -131,7 +138,8 @@ function App() {
           : "Movie added successfully 🎉"
       );
     } catch (err) {
-      setError(err.message || "Operation failed");
+      console.error("SUBMIT ERROR 👉", err);
+      setError("Operation failed ❌");
     } finally {
       setLoading(false);
     }
@@ -150,7 +158,8 @@ function App() {
 
       fetchMovies();
     } catch (err) {
-      setError(err.message || "Delete failed");
+      console.error("DELETE ERROR 👉", err);
+      setError("Delete failed ❌");
     }
   };
 
@@ -160,7 +169,6 @@ function App() {
 
   return (
     <div style={styles.container}>
-      {/* 🎬 Title */}
       <h1 style={styles.title}>🎬 My Movie Tracker</h1>
       <p style={styles.subtitle}>
         A simple app to manage and rate my favorite movies

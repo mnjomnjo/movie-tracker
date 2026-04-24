@@ -13,12 +13,19 @@ export default function MovieList({
   const [genre, setGenre] = useState("");
   const [rating, setRating] = useState("");
 
-  // 🔍 Apply filter
+  // 🔍 Filter (genre + rating)
   const handleFilter = () => {
-    onFilter({
-      genre,
-      rating: rating ? Number(rating) : undefined,
-    });
+    const filters = {};
+
+    if (genre) {
+      filters.genre = genre;
+    }
+
+    if (rating !== "") {
+      filters.rating = Number(rating);
+    }
+
+    onFilter(filters);
   };
 
   // 🔄 Reset filters
@@ -28,24 +35,37 @@ export default function MovieList({
     onFilter({});
   };
 
-  // ⏳ Loading state
+  // ⏳ Loading
   if (loading) return <p style={styles.center}>Loading movies...</p>;
 
-  // ❌ Error state
+  // ❌ Error
   if (error) return <p style={{ ...styles.center, color: "red" }}>{error}</p>;
 
   return (
     <div>
       {/* 🔍 Filter Section */}
       <div style={styles.filter}>
-        <input
-          type="text"
-          placeholder="Filter by genre"
+        
+        {/* 🎯 Genre Dropdown */}
+        <select
           value={genre}
           onChange={(e) => setGenre(e.target.value)}
           style={styles.input}
-        />
+        >
+          <option value="">All Genres</option>
+          <option value="Action">Action</option>
+          <option value="Drama">Drama</option>
+          <option value="Comedy">Comedy</option>
+          <option value="Horror">Horror</option>
+          <option value="Sci-Fi">Sci-Fi</option>
+          <option value="Romance">Romance</option>
+          <option value="Fantasy">Fantasy</option>
+          <option value="Thriller">Thriller</option>
+          <option value="Adventure">Adventure</option>
+          <option value="Animation">Animation</option>
+        </select>
 
+        {/* ⭐ Rating */}
         <input
           type="number"
           placeholder="Min rating"
@@ -54,6 +74,7 @@ export default function MovieList({
           style={styles.input}
         />
 
+        {/* 🔘 Buttons */}
         <button onClick={handleFilter} style={styles.button}>
           Filter
         </button>
@@ -63,20 +84,20 @@ export default function MovieList({
         </button>
       </div>
 
-      {/* 📭 Empty state */}
+      {/* 📭 Empty */}
       {!movies || movies.length === 0 ? (
         <p style={styles.center}>No movies found.</p>
       ) : (
         <div className="grid">
-            {movies.map((movie, index) => (
+          {movies.map((movie, index) => (
             <div
-               key={movie._id || movie.id}
-               className="card"
-               style={{
-               ...styles.cardWrapper,
-               animationDelay: `${index * 0.1}s`, // 🔥 stagger effect
-      }}
-    >
+              key={movie._id || movie.id}
+              className="card"
+              style={{
+                ...styles.cardWrapper,
+                animationDelay: `${index * 0.1}s`,
+              }}
+            >
               <MovieCard
                 movie={movie}
                 onDelete={onDelete}
@@ -109,7 +130,7 @@ const styles = {
     padding: "8px",
     borderRadius: "6px",
     border: "1px solid #ccc",
-    minWidth: "120px",
+    minWidth: "140px",
   },
 
   button: {

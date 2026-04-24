@@ -2,11 +2,22 @@ import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 
 import movieRoutes from "./routes/movieRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
 
-dotenv.config();
+/**
+ * 📁 Fix __dirname (ESM)
+ */
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+/**
+ * 🔥 FIX: Load .env from backend folder
+ */
+dotenv.config({ path: path.join(__dirname, ".env") });
 
 const app = express();
 
@@ -14,17 +25,24 @@ const app = express();
  * 🔥 Middleware
  */
 
-// Enable CORS
-app.use(cors());
+// ✅ CORS (frontend connection)
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
 
-// Parse JSON body (VERY IMPORTANT)
+// Parse JSON
 app.use(express.json());
 
-// Debug middleware (IMPORTANT for your case)
+/**
+ * 🔍 Debug middleware (optional)
+ */
 app.use((req, res, next) => {
   console.log("👉 METHOD:", req.method);
   console.log("👉 URL:", req.url);
-  console.log("👉 BODY:", req.body); 
   next();
 });
 
@@ -56,6 +74,14 @@ app.use((err, req, res, next) => {
  * 🔗 Connect to MongoDB + Start Server
  */
 const PORT = process.env.PORT || 5000;
+
+// 🔥 Debug
+console.log("🔍 MONGO_URI:", process.env.MONGO_URI);
+
+if (!process.env.MONGO_URI) {
+  console.error("❌ MONGO_URI is missing! Check your .env file");
+  process.exit(1);
+}
 
 mongoose
   .connect(process.env.MONGO_URI)
