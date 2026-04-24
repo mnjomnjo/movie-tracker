@@ -6,44 +6,54 @@ import {
   updateMovie,
   deleteMovie,
   getTopRatedMovies,
-  getMovieReviews 
+  getMovieReviews,
 } from "../controllers/movieController.js";
 
 const router = express.Router();
 
 /**
- * @route   POST /api/movies
+ * Base route: /api/movies
+ */
+
+/**
+ * @route   POST /
+ * @desc    Create a new movie
  */
 router.post("/", createMovie);
 
 /**
- * @route   GET /api/movies/top-rated
+ * @route   GET /top-rated
+ * @desc    Get top rated movies (rating >= 8)
  */
 router.get("/top-rated", getTopRatedMovies);
 
 /**
- * 🔥 NEW RELATIONAL ENDPOINT
- * @route   GET /api/movies/:id/reviews
+ * @route   GET /:id/reviews
+ * @desc    Get all reviews for a specific movie (relational endpoint)
  */
 router.get("/:id/reviews", getMovieReviews);
 
 /**
- * @route   GET /api/movies
+ * @route   GET /
+ * @desc    Get all movies with optional filters (genre, rating, year)
  */
 router.get("/", getMovies);
 
 /**
- * @route   GET /api/movies/:id
+ * @route   GET /:id
+ * @desc    Get a single movie by ID
  */
 router.get("/:id", getMovieById);
 
 /**
- * @route   PUT /api/movies/:id
+ * @route   PUT /:id
+ * @desc    Update a movie by ID (full update)
  */
 router.put("/:id", updateMovie);
 
 /**
- * @route   DELETE /api/movies/:id
+ * @route   DELETE /:id
+ * @desc    Delete a movie by ID
  */
 router.delete("/:id", deleteMovie);
 

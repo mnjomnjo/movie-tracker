@@ -1,6 +1,6 @@
 # 🎬 Movie Tracker App
 
-A fullstack web application to track movies, ratings, and reviews.
+A fullstack web application to track movies, ratings, and reviews using the MERN stack.
 
 ## 📌 Problem
 
@@ -77,9 +77,9 @@ http://localhost:5173
 * Edit existing movies
 * Delete movies
 * View movie list
-* Filter and sort movies
-* Custom endpoint for top-rated movies
-
+** Filter movies by genre and rating
+* Get top-rated movies
+* Manage reviews linked to movies and users
 ---
 
 ## 🔗 API Endpoints
@@ -91,6 +91,7 @@ http://localhost:5173
 * PUT /api/movies/:id
 * DELETE /api/movies/:id
 * GET /api/movies/top-rated
+* GET /api/movies/:id/reviews
 
 ### Reviews
 
@@ -118,14 +119,21 @@ Relationships:
 
 ## 🧪 Seed Data
 
-Run:
+Run to populate the database with sample data:
 
 ```
 node seed.js
 ```
 
 ---
+## 🏗️ Structure
 
+The backend is organized using:
+- Models
+- Controllers
+- Routes
+
+---
 ## 👤 Author
 
 Mohammed Nour

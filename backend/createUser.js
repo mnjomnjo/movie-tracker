@@ -4,12 +4,26 @@ import User from "./models/User.js";
 
 dotenv.config();
 
-await mongoose.connect(process.env.MONGO_URI);
+const createUser = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("Connected to DB");
 
-await User.create({
-  name: "Mohammed",
-  email: "mohammed@test.com"
-});
+    const user = await User.create({
+      name: "Mohammed",
+      email: "mohammed@test.com",
+    });
 
-console.log("User added ✅");
-process.exit();
+    console.log("User added ✅", user);
+
+    await mongoose.disconnect();
+    process.exit(0);
+  } catch (error) {
+    console.error("Error creating user:", error);
+
+    await mongoose.disconnect();
+    process.exit(1);
+  }
+};
+
+createUser();

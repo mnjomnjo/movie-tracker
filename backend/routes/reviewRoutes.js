@@ -1,87 +1,46 @@
 import express from "express";
-import Review from "../models/Review.js";
+import {
+  createReview,
+  getReviews,
+  updateReview,
+  deleteReview,
+  getReviewStats,
+} from "../controllers/reviewController.js";
 
 const router = express.Router();
 
 /**
- * @route   POST /api/reviews
- * @desc    Create new review
+ * Base route: /api/reviews
  */
-router.post("/", async (req, res) => {
-  try {
-    const { userId, movieId, score } = req.body;
-
-    // ✅ Validation (مهم جدًا)
-    if (!userId || !movieId || !score) {
-      return res.status(400).json({ error: "Missing required fields" });
-    }
-
-    const review = new Review(req.body);
-    const savedReview = await review.save();
-
-    res.status(201).json(savedReview);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-});
 
 /**
- * @route   GET /api/reviews
- * @desc    Get all reviews with populated data
+ * @route   POST /
+ * @desc    Create a new review
  */
-router.get("/", async (req, res) => {
-  try {
-    const reviews = await Review.find()
-      .populate("movieId", "title genre")
-      .populate("userId", "name email");
-
-    res.status(200).json(reviews);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+router.post("/", createReview);
 
 /**
- * @route   PUT /api/reviews/:id
- * @desc    Update review
+ * @route   GET /
+ * @desc    Get all reviews with populated user and movie data
  */
-router.put("/:id", async (req, res) => {
-  try {
-    const updatedReview = await Review.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
-
-    if (!updatedReview) {
-      return res.status(404).json({ message: "Review not found" });
-    }
-
-    res.status(200).json(updatedReview);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-});
+router.get("/", getReviews);
 
 /**
- * @route   DELETE /api/reviews/:id
- * @desc    Delete review
+ * @route   GET /stats
+ * @desc    Get review statistics (average score per movie)
  */
-router.delete("/:id", async (req, res) => {
-  try {
-    const deletedReview = await Review.findByIdAndDelete(req.params.id);
+router.get("/stats", getReviewStats);
 
-    if (!deletedReview) {
-      return res.status(404).json({ message: "Review not found" });
-    }
+/**
+ * @route   PUT /:id
+ * @desc    Update a review by ID
+ */
+router.put("/:id", updateReview);
 
-    res.status(200).json({ message: "Review deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+/**
+ * @route   DELETE /:id
+ * @desc    Delete a review by ID
+ */
+router.delete("/:id", deleteReview);
 
 export default router;

@@ -1,0 +1,47 @@
+/* 📦 Grid layout (clean + responsive) */
+.grid {
+  display: grid;
+  gap: 25px;
+  margin-top: 40px;
+  justify-content: center;
+}
+
+/* 📱 Mobile (1 card) */
+.grid {
+  grid-template-columns: 1fr;
+}
+
+/* 💻 Tablet (2 cards) */
+@media (min-width: 600px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(250px, 300px));
+  }
+}
+
+/* 🖥️ Desktop (3 cards) */
+@media (min-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(250px, 300px));
+  }
+}
+
+/* 🎬 Card animation (fade + slide) */
+.card {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp 0.5s ease forwards;
+  transition: transform 0.2s ease; /* 👈 مهم */
+}
+
+/* 🔥 Keyframes */
+@keyframes fadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ✨ Hover effect (smooth) */
+.card:hover {
+  transform: translateY(0) scale(1.05); /* 👈 FIX */
+}

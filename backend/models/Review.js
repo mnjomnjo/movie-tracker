@@ -1,26 +1,37 @@
 import mongoose from "mongoose";
-import "./User.js";   // 🔥 مهم جدًا (يسجل model في mongoose)
-import "./Movie.js";  // 🔥 مهم جدًا
+import "./User.js";   // Ensures User model is registered in mongoose
+import "./Movie.js";  // Ensures Movie model is registered in mongoose
 
-const reviewSchema = new mongoose.Schema({
-  comment: {
-    type: String,
-    required: true,
+const reviewSchema = new mongoose.Schema(
+  {
+    comment: {
+      type: String,
+      required: [true, "Comment is required"],
+      trim: true,
+    },
+    score: {
+      type: Number,
+      required: [true, "Score is required"],
+      min: 0,
+      max: 10,
+    },
+    movieId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Movie",
+      required: [true, "Movie reference is required"],
+    },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: [true, "User reference is required"],
+    },
   },
-  score: {
-    type: Number,
-    required: true,
-    min: 1,
-    max: 10,
-  },
-  movieId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Movie",
-  },
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-  },
-});
+  {
+    timestamps: true, // Automatically adds createdAt and updatedAt
+  }
+);
+
+// Optional: Prevent duplicate reviews (one review per user per movie)
+reviewSchema.index({ userId: 1, movieId: 1 }, { unique: true });
 
 export default mongoose.model("Review", reviewSchema);

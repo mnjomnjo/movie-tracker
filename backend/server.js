@@ -1,40 +1,71 @@
-// Import required packages
 import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import movieRoutes from "./routes/movieRoutes.js";
-import reviewRoutes from "./routes/reviewRoutes.js"; // Import review routes
 
-// Load environment variables from .env file
+import movieRoutes from "./routes/movieRoutes.js";
+import reviewRoutes from "./routes/reviewRoutes.js";
+
 dotenv.config();
 
-// Create Express application
 const app = express();
 
-// Middleware setup
-app.use(cors()); // Enable CORS for cross-origin requests
-app.use(express.json()); // Parse incoming JSON requests
+/**
+ * 🔥 Middleware
+ */
 
-// API routes
-app.use("/api/movies", movieRoutes); // Movie endpoints
-app.use("/api/reviews", reviewRoutes); // Review endpoints
+// Enable CORS
+app.use(cors());
 
-// Connect to MongoDB Atlas using MONGO_URI from environment variables
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.error("MongoDB connection error:", err));
+// Parse JSON body (VERY IMPORTANT)
+app.use(express.json());
 
-// Root route for testing the API
+// Debug middleware (IMPORTANT for your case)
+app.use((req, res, next) => {
+  console.log("👉 METHOD:", req.method);
+  console.log("👉 URL:", req.url);
+  console.log("👉 BODY:", req.body); 
+  next();
+});
+
+/**
+ * 📌 Routes
+ */
+app.use("/api/movies", movieRoutes);
+app.use("/api/reviews", reviewRoutes);
+
+/**
+ * 🏠 Root route
+ */
 app.get("/", (req, res) => {
   res.send("API is running...");
 });
 
-// Define server port (use .env or fallback to 5000)
+/**
+ * ❌ Global error handler
+ */
+app.use((err, req, res, next) => {
+  console.error("❌ ERROR:", err.stack);
+  res.status(500).json({
+    message: "Something went wrong",
+    error: err.message,
+  });
+});
+
+/**
+ * 🔗 Connect to MongoDB + Start Server
+ */
 const PORT = process.env.PORT || 5000;
 
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("✅ MongoDB connected");
+
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("❌ MongoDB connection error:", err);
+  });

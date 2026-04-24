@@ -11,6 +11,8 @@ const movieSchema = new mongoose.Schema(
       type: String,
       required: [true, "Genre is required"],
       trim: true,
+     enum: ["Action", "Drama", "Comedy", "Horror", "Sci-Fi", "Romance", 
+      "Fantasy",  "Thriller", "Adventure", "Animation"],
     },
     releaseYear: {
       type: Number,
@@ -21,11 +23,9 @@ const movieSchema = new mongoose.Schema(
     rating: {
       type: Number,
       required: [true, "Rating is required"],
-      min: 1,
+      min: 0,
       max: 10,
     },
-
-    // 🔥 NEW: Custom Field
     director: {
       type: String,
       required: [true, "Director is required"],
