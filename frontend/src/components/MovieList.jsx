@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import MovieCard from "./MovieCard";
 import "./MovieList.css";
 
@@ -10,23 +10,14 @@ export default function MovieList({
   error,
   onFilter,
 }) {
+  // 🎯 Local filter state
   const [genre, setGenre] = useState("");
   const [rating, setRating] = useState("");
 
-  // 🔁 Auto-refresh using interval
-  useEffect(() => {
-    // Call filter (or fetch) every 5 seconds to refresh data
-    const interval = setInterval(() => {
-      onFilter({}); // fetch all movies again (no filters)
-    }, 5000);
-
-    // 🧹 Cleanup to prevent memory leaks
-    return () => {
-      clearInterval(interval);
-    };
-  }, [onFilter]);
-
-  // 🔍 Filter (genre + rating)
+  /**
+   * 🔍 Handle filter
+   * - Send selected filters to parent (App.jsx)
+   */
   const handleFilter = () => {
     const filters = {};
 
@@ -41,7 +32,11 @@ export default function MovieList({
     onFilter(filters);
   };
 
-  // 🔄 Reset filters
+  /**
+   * 🔄 Reset filters
+   * - Clear inputs
+   * - Fetch all movies again
+   */
   const handleReset = () => {
     setGenre("");
     setRating("");

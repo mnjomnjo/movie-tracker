@@ -9,6 +9,9 @@ function App() {
   const [movies, setMovies] = useState([]);
   const [editingId, setEditingId] = useState(null);
 
+  // 🎯 NEW: store active filters
+  const [filters, setFilters] = useState({});
+
   const [form, setForm] = useState({
     title: "",
     genre: "",
@@ -20,12 +23,16 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // 🔄 Fetch movies from API
+  /**
+   * 🔄 Fetch movies from API
+   * - Supports optional filtering
+   */
   const fetchMovies = async (filters = {}) => {
     try {
       setLoading(true);
       setError("");
 
+      // Convert filters to query string
       const query = new URLSearchParams(filters).toString();
       const url = query ? `${API_URL}?${query}` : API_URL;
 
@@ -51,22 +58,11 @@ function App() {
   };
 
   /**
-   * 🔥 AUTO REFRESH (LAB REQUIREMENT)
-   * - Fetch data on mount
-   * - Refresh every 5 seconds
-   * - Cleanup interval on unmount (VERY IMPORTANT)
+   * 🚀 INITIAL LOAD ONLY
+   * - Fetch movies once when app loads
    */
   useEffect(() => {
     fetchMovies(); // initial fetch
-
-    const interval = setInterval(() => {
-      fetchMovies(); // auto refresh every 5s
-    }, 5000);
-
-    // 🧹 Cleanup to prevent memory leaks
-    return () => {
-      clearInterval(interval);
-    };
   }, []);
 
   // 📝 Handle input changes
@@ -103,7 +99,9 @@ function App() {
     });
   };
 
-  // ✅ Submit (Create or Update)
+  /**
+   * ✅ Create or Update movie
+   */
   const handleSubmit = async () => {
     if (
       !form.title ||
@@ -145,7 +143,9 @@ function App() {
       const isEditing = editingId;
 
       resetForm();
-      fetchMovies();
+
+      // 🔥 IMPORTANT: fetch using current filters (NOT all movies)
+      fetchMovies(filters);
 
       alert(
         isEditing
@@ -160,7 +160,9 @@ function App() {
     }
   };
 
-  // 🗑 Delete movie
+  /**
+   * 🗑 Delete movie
+   */
   const deleteMovie = async (id) => {
     if (!window.confirm("Are you sure you want to delete this movie?")) return;
 
@@ -171,16 +173,22 @@ function App() {
 
       if (!res.ok) throw new Error("Delete failed");
 
-      fetchMovies();
+      // 🔥 IMPORTANT: keep filters after delete
+      fetchMovies(filters);
     } catch (err) {
       console.error("DELETE ERROR 👉", err);
       setError("Delete failed ❌");
     }
   };
 
-  // 🔍 Handle filtering
-  const handleFilter = (filters) => {
-    fetchMovies(filters);
+  /**
+   * 🔍 Handle filtering
+   * - Save filters
+   * - Fetch filtered data
+   */
+  const handleFilter = (newFilters) => {
+    setFilters(newFilters);      // store filters
+    fetchMovies(newFilters);     // fetch filtered movies
   };
 
   return (
