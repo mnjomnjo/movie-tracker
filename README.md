@@ -84,6 +84,7 @@ http://localhost:5173
 
 ---
 
+
 ## 🔐 Authentication Features
 
 * User Registration
