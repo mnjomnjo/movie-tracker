@@ -3,32 +3,24 @@
   "version": "1.0.0",
   "description": "A fullstack web application to track movies, ratings, and reviews using the MERN stack.",
   "main": "index.js",
-  "type": "commonjs",
-
+  "type": "module",
   "scripts": {
     "server": "node backend/server.js",
     "client": "npm run dev --prefix frontend",
     "dev": "concurrently \"npm run server\" \"npm run client\""
   },
-
   "dependencies": {
     "concurrently": "^9.2.1"
   },
-
-  "devDependencies": {},
-
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mnjomnjo/movie-tracker.git"
   },
-
   "keywords": [],
-  "author": "",
+  "author": "Mohammed Nour",
   "license": "ISC",
-
   "bugs": {
     "url": "https://github.com/mnjomnjo/movie-tracker/issues"
   },
-
   "homepage": "https://github.com/mnjomnjo/movie-tracker#readme"
 }

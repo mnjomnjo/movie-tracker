@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import MovieForm from "./components/MovieForm";
 import MovieList from "./components/MovieList";
 
-// ✅ FIX: استخدم 127.0.0.1 بدل localhost
+// API URL
 const API_URL = "http://127.0.0.1:5000/api/movies";
 
 function App() {
@@ -20,7 +20,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // 🔄 Fetch movies
+  // 🔄 Fetch movies from API
   const fetchMovies = async (filters = {}) => {
     try {
       setLoading(true);
@@ -50,11 +50,26 @@ function App() {
     }
   };
 
+  /**
+   * 🔥 AUTO REFRESH (LAB REQUIREMENT)
+   * - Fetch data on mount
+   * - Refresh every 5 seconds
+   * - Cleanup interval on unmount (VERY IMPORTANT)
+   */
   useEffect(() => {
-    fetchMovies();
+    fetchMovies(); // initial fetch
+
+    const interval = setInterval(() => {
+      fetchMovies(); // auto refresh every 5s
+    }, 5000);
+
+    // 🧹 Cleanup to prevent memory leaks
+    return () => {
+      clearInterval(interval);
+    };
   }, []);
 
-  // 📝 Handle input
+  // 📝 Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -64,7 +79,7 @@ function App() {
     }));
   };
 
-  // ✏️ Edit
+  // ✏️ Edit movie
   const editMovie = (movie) => {
     setForm({
       title: movie.title,
@@ -76,7 +91,7 @@ function App() {
     setEditingId(movie._id);
   };
 
-  // 🔄 Reset
+  // 🔄 Reset form
   const resetForm = () => {
     setEditingId(null);
     setForm({
@@ -88,7 +103,7 @@ function App() {
     });
   };
 
-  // ✅ Submit
+  // ✅ Submit (Create or Update)
   const handleSubmit = async () => {
     if (
       !form.title ||
@@ -145,7 +160,7 @@ function App() {
     }
   };
 
-  // 🗑 Delete
+  // 🗑 Delete movie
   const deleteMovie = async (id) => {
     if (!window.confirm("Are you sure you want to delete this movie?")) return;
 
@@ -163,6 +178,7 @@ function App() {
     }
   };
 
+  // 🔍 Handle filtering
   const handleFilter = (filters) => {
     fetchMovies(filters);
   };
@@ -174,8 +190,10 @@ function App() {
         A simple app to manage and rate my favorite movies
       </p>
 
+      {/* ❗ Error message */}
       {error && <p style={styles.error}>{error}</p>}
 
+      {/* 📝 Form */}
       <MovieForm
         form={form}
         onChange={handleChange}
@@ -184,6 +202,7 @@ function App() {
         onCancel={resetForm}
       />
 
+      {/* 📋 Movie list */}
       <MovieList
         movies={movies}
         onDelete={deleteMovie}
@@ -196,6 +215,7 @@ function App() {
   );
 }
 
+// 🎨 Styles
 const styles = {
   container: {
     maxWidth: "900px",

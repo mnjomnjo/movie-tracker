@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import MovieCard from "./MovieCard";
 import "./MovieList.css";
 
@@ -12,6 +12,19 @@ export default function MovieList({
 }) {
   const [genre, setGenre] = useState("");
   const [rating, setRating] = useState("");
+
+  // 🔁 Auto-refresh using interval
+  useEffect(() => {
+    // Call filter (or fetch) every 5 seconds to refresh data
+    const interval = setInterval(() => {
+      onFilter({}); // fetch all movies again (no filters)
+    }, 5000);
+
+    // 🧹 Cleanup to prevent memory leaks
+    return () => {
+      clearInterval(interval);
+    };
+  }, [onFilter]);
 
   // 🔍 Filter (genre + rating)
   const handleFilter = () => {
@@ -35,17 +48,17 @@ export default function MovieList({
     onFilter({});
   };
 
-  // ⏳ Loading
+  // ⏳ Loading state
   if (loading) return <p style={styles.center}>Loading movies...</p>;
 
-  // ❌ Error
-  if (error) return <p style={{ ...styles.center, color: "red" }}>{error}</p>;
+  // ❌ Error state
+  if (error)
+    return <p style={{ ...styles.center, color: "red" }}>{error}</p>;
 
   return (
     <div>
       {/* 🔍 Filter Section */}
       <div style={styles.filter}>
-        
         {/* 🎯 Genre Dropdown */}
         <select
           value={genre}
@@ -65,7 +78,7 @@ export default function MovieList({
           <option value="Animation">Animation</option>
         </select>
 
-        {/* ⭐ Rating */}
+        {/* ⭐ Rating Input */}
         <input
           type="number"
           placeholder="Min rating"
@@ -84,7 +97,7 @@ export default function MovieList({
         </button>
       </div>
 
-      {/* 📭 Empty */}
+      {/* 📭 Empty state */}
       {!movies || movies.length === 0 ? (
         <p style={styles.center}>No movies found.</p>
       ) : (

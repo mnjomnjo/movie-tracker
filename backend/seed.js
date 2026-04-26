@@ -9,24 +9,25 @@ dotenv.config();
 
 const seedData = async () => {
   try {
+    // 🔌 Connect to MongoDB Atlas
     await mongoose.connect(process.env.MONGO_URI);
     console.log("Connected to DB");
 
-    // Clear existing data
+    // 🧹 Clear existing data before seeding
     await Movie.deleteMany();
     await User.deleteMany();
     await Review.deleteMany();
 
-    // Users
+    // 👤 Create Users (realistic data)
     const users = await User.insertMany([
-      { name: "Mohammed Hassan", email: "mohammed.hassan@gmail.com" },
-      { name: "Sara Ahmed", email: "sara.ahmed@yahoo.com" },
-      { name: "Ali Khaled", email: "ali.khaled@hotmail.com" },
-      { name: "Lina Youssef", email: "lina.youssef@gmail.com" },
-      { name: "Omar Farouk", email: "omar.farouk@outlook.com" },
+      { name: "Mohammed Hassan", email: "mohammed.hassan@gmail.com", password: "123456" },
+      { name: "Sara Ahmed", email: "sara.ahmed@yahoo.com", password: "123456" },
+      { name: "Ali Khaled", email: "ali.khaled@hotmail.com", password: "123456" },
+      { name: "Lina Youssef", email: "lina.youssef@gmail.com", password: "123456" },
+      { name: "Omar Farouk", email: "omar.farouk@outlook.com", password: "123456" },
     ]);
 
-    // Movies (fixed genre to match enum)
+    // 🎬 Create Movies (each movie linked to a user)
     const movies = await Movie.insertMany([
       {
         title: "Inception",
@@ -34,6 +35,7 @@ const seedData = async () => {
         rating: 9,
         releaseYear: 2010,
         director: "Christopher Nolan",
+        user: users[0]._id, // 🔗 relationship with User
       },
       {
         title: "Interstellar",
@@ -41,6 +43,7 @@ const seedData = async () => {
         rating: 8,
         releaseYear: 2014,
         director: "Christopher Nolan",
+        user: users[1]._id,
       },
       {
         title: "The Dark Knight",
@@ -48,6 +51,7 @@ const seedData = async () => {
         rating: 10,
         releaseYear: 2008,
         director: "Christopher Nolan",
+        user: users[2]._id,
       },
       {
         title: "Titanic",
@@ -55,17 +59,19 @@ const seedData = async () => {
         rating: 8,
         releaseYear: 1997,
         director: "James Cameron",
+        user: users[3]._id,
       },
       {
         title: "Avatar",
-        genre: "Sci-Fi", // changed from Fantasy to match enum
+        genre: "Sci-Fi",
         rating: 7,
         releaseYear: 2009,
         director: "James Cameron",
+        user: users[4]._id,
       },
     ]);
 
-    // Reviews
+    // ⭐ Create Reviews (linking Users and Movies)
     await Review.insertMany([
       {
         userId: users[0]._id,
@@ -106,7 +112,7 @@ const seedData = async () => {
 
     console.log("Data seeded successfully ✅");
 
-    // Properly close DB connection
+    // 🔌 Close DB connection properly
     await mongoose.disconnect();
     process.exit(0);
   } catch (error) {
