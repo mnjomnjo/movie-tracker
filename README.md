@@ -21,15 +21,6 @@ This application helps users organize, manage, and rate movies they have watched
 
 ## ⚙️ Setup Instructions
 
-### 🚀 Quick Start
-
-Run both frontend and backend with one command:
-
-```bash
-# Start both frontend and backend using concurrently
-npm run dev
-```
-
 ### 1. Clone the repository
 
 ```bash
@@ -39,14 +30,18 @@ cd movie-tracker
 
 ---
 
-### 2. Setup Backend
+### 2. Install dependencies
 
 ```bash
-cd backend
 npm install
+cd backend && npm install
+cd ../frontend && npm install
 ```
+---
 
-Create a `.env` file inside `backend`:
+### 3. Environment Variables
+
+Create a `.env` file inside the `backend` folder:
 
 ```env
 MONGO_URI=your_mongodb_connection_string
@@ -54,7 +49,9 @@ PORT=5000
 JWT_SECRET=your_secret_key
 ```
 
-Run backend:
+---
+
+### 4. Run the application
 
 ```bash
 npm run dev
@@ -62,22 +59,9 @@ npm run dev
 
 ---
 
-### 3. Setup Frontend
-
-Open a new terminal:
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
----
-
-### 4. Open App
+### 5. Open App
 
 Go to:
-
 ```
 http://localhost:5173
 ```
