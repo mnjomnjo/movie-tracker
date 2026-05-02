@@ -9,7 +9,7 @@ function App() {
   const [movies, setMovies] = useState([]);
   const [editingId, setEditingId] = useState(null);
 
-  // 🎯 NEW: store active filters
+  // Store active filters
   const [filters, setFilters] = useState({});
 
   const [form, setForm] = useState({
@@ -24,8 +24,8 @@ function App() {
   const [error, setError] = useState("");
 
   /**
-   * 🔄 Fetch movies from API
-   * - Supports optional filtering
+   * Fetch movies from API
+   * Supports optional filtering
    */
   const fetchMovies = async (filters = {}) => {
     try {
@@ -58,14 +58,27 @@ function App() {
   };
 
   /**
-   * 🚀 INITIAL LOAD ONLY
-   * - Fetch movies once when app loads
+   * Initial load + Auto-refresh
+   * - Fetch movies when component mounts
+   * - Re-fetch every 5 seconds
+   * - Cleanup interval on unmount
    */
   useEffect(() => {
-    fetchMovies(); // initial fetch
-  }, []);
+    // Initial fetch
+    fetchMovies(filters);
 
-  // 📝 Handle input changes
+    // Set interval for auto-refresh
+    const interval = setInterval(() => {
+      fetchMovies(filters);
+    }, 5000);
+
+    // Cleanup function (IMPORTANT)
+    return () => {
+      clearInterval(interval);
+    };
+  }, [filters]);
+
+  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -75,7 +88,7 @@ function App() {
     }));
   };
 
-  // ✏️ Edit movie
+  // Edit movie
   const editMovie = (movie) => {
     setForm({
       title: movie.title,
@@ -87,7 +100,7 @@ function App() {
     setEditingId(movie._id);
   };
 
-  // 🔄 Reset form
+  // Reset form
   const resetForm = () => {
     setEditingId(null);
     setForm({
@@ -100,7 +113,7 @@ function App() {
   };
 
   /**
-   * ✅ Create or Update movie
+   * Create or Update movie
    */
   const handleSubmit = async () => {
     if (
@@ -144,7 +157,7 @@ function App() {
 
       resetForm();
 
-      // 🔥 IMPORTANT: fetch using current filters (NOT all movies)
+      // Refresh using current filters
       fetchMovies(filters);
 
       alert(
@@ -161,7 +174,7 @@ function App() {
   };
 
   /**
-   * 🗑 Delete movie
+   * Delete movie
    */
   const deleteMovie = async (id) => {
     if (!window.confirm("Are you sure you want to delete this movie?")) return;
@@ -173,7 +186,7 @@ function App() {
 
       if (!res.ok) throw new Error("Delete failed");
 
-      // 🔥 IMPORTANT: keep filters after delete
+      // Refresh using current filters
       fetchMovies(filters);
     } catch (err) {
       console.error("DELETE ERROR 👉", err);
@@ -182,13 +195,11 @@ function App() {
   };
 
   /**
-   * 🔍 Handle filtering
-   * - Save filters
-   * - Fetch filtered data
+   * Handle filtering
    */
   const handleFilter = (newFilters) => {
-    setFilters(newFilters);      // store filters
-    fetchMovies(newFilters);     // fetch filtered movies
+    setFilters(newFilters);      // Save filters
+    fetchMovies(newFilters);     // Fetch filtered movies
   };
 
   return (
@@ -198,10 +209,10 @@ function App() {
         A simple app to manage and rate my favorite movies
       </p>
 
-      {/* ❗ Error message */}
+      {/* Error message */}
       {error && <p style={styles.error}>{error}</p>}
 
-      {/* 📝 Form */}
+      {/* Form */}
       <MovieForm
         form={form}
         onChange={handleChange}
@@ -210,7 +221,7 @@ function App() {
         onCancel={resetForm}
       />
 
-      {/* 📋 Movie list */}
+      {/* Movie list */}
       <MovieList
         movies={movies}
         onDelete={deleteMovie}
@@ -223,7 +234,7 @@ function App() {
   );
 }
 
-// 🎨 Styles
+// Styles
 const styles = {
   container: {
     maxWidth: "900px",
